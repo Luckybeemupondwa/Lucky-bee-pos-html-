@@ -2,321 +2,263 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Bee POS Pro - Enterprise</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lucky Bee POS</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            --brand: #6366f1; --bg: #f8fafc; --sidebar: #ffffff; --card: #ffffff;
-            --text-main: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
-            --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+            --brand: #6366f1; 
+            --brand-grad: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --muted: #64748b; --border: #e2e8f0;
         }
 
         [data-theme="dark"] {
-            --bg: #0f172a; --sidebar: #1e293b; --card: #1e293b;
-            --text-main: #f8fafc; --text-muted: #94a3b8; --border: #334155;
+            --bg: #020617; --card: #0f172a; --text: #f8fafc; --muted: #94a3b8; --border: #1e293b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text-main); display: flex; min-height: 100vh; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-        /* Sidebar */
-        nav { width: 260px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 30px 20px; position: fixed; height: 100vh; z-index: 100; }
-        .nav-link { padding: 12px 15px; border-radius: 12px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 5px; border: none; background: none; width: 100%; font-size: 14px; text-align: left; }
-        .nav-link.active { background: var(--brand); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-
-        /* Content Area */
-        main { margin-left: 260px; flex: 1; padding: 30px; width: calc(100% - 260px); }
-        .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); padding: 24px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); margin-bottom: 25px; }
+        /* --- SPLASH SCREEN --- */
+        #splash {
+            position: fixed; inset: 0; background: #0f172a; z-index: 5000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease-out;
+        }
+        .bee-logo {
+            font-size: 60px; animation: float 2s infinite ease-in-out; margin-bottom: 20px;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
         
-        /* Stats Grid */
-        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-box { padding: 20px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); }
-        .stat-box small { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        .stat-box h2 { font-size: 22px; margin-top: 5px; }
+        .loader-bar {
+            width: 200px; height: 4px; background: rgba(255,255,255,0.1);
+            border-radius: 10px; overflow: hidden;
+        }
+        .loader-progress {
+            width: 0%; height: 100%; background: var(--brand-grad);
+            animation: load 2.5s forwards;
+        }
+        @keyframes load { to { width: 100%; } }
 
-        /* Form Elements */
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); margin-bottom: 10px; outline: none; }
-        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; justify-content: center; }
-        .btn-brand { background: var(--brand); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        /* --- LOGIN PAGE --- */
+        #loginPage {
+            position: fixed; inset: 0; background: var(--bg); z-index: 4000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .login-card {
+            width: 380px; padding: 40px; background: var(--card); border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1); text-align: center;
+        }
 
-        /* POS Grid */
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
-        .product-card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; position: relative; }
-        .product-card .stock-label { position: absolute; top: 5px; right: 5px; font-size: 9px; padding: 2px 5px; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); }
+        /* --- MAIN LAYOUT --- */
+        nav { 
+            width: 280px; background: var(--card); border-right: 1px solid var(--border); 
+            height: 100vh; position: fixed; padding: 40px 20px; z-index: 100;
+        }
+        main { margin-left: 280px; padding: 40px; width: calc(100% - 280px); min-height: 100vh; }
 
-        /* Tables */
+        /* UI ELEMENTS */
+        .nav-link {
+            padding: 14px 18px; border-radius: 14px; color: var(--muted); font-weight: 600;
+            display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 8px; border: none; background: none; width: 100%; transition: 0.2s;
+        }
+        .nav-link.active { background: var(--brand-grad); color: white; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
+
+        .card { background: var(--card); border-radius: 24px; border: 1px solid var(--border); padding: 25px; margin-bottom: 25px; }
+        
+        input { 
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); 
+            background: var(--bg); color: var(--text); margin-bottom: 12px; outline: none;
+        }
+        .btn { 
+            padding: 14px 24px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer;
+            background: var(--brand-grad); color: white; transition: 0.3s;
+        }
+        .btn:active { transform: scale(0.95); }
+
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .p-card { 
+            background: var(--card); border: 1px solid var(--border); padding: 20px; 
+            border-radius: 20px; text-align: center; cursor: pointer;
+        }
+        
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; border-bottom: 2px solid var(--border); }
-        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
-
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
-        .badge-success { background: #dcfce7; color: #16a34a; }
-        .badge-danger { background: #fee2e2; color: #ef4444; }
+        th { text-align: left; padding: 15px; font-size: 11px; color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
         .hidden { display: none !important; }
-        @media (max-width: 1024px) { nav { width: 80px; } nav span { display: none; } main { margin-left: 80px; width: calc(100% - 80px); } }
+        @media (max-width: 1024px) { nav { width: 85px; } nav span { display: none; } main { margin-left: 85px; width: calc(100% - 85px); } }
     </style>
 </head>
-<body data-theme="light">
+<body>
 
-<div id="loginPage" style="position:fixed; inset:0; background:#0f172a; z-index:2000; display:flex; align-items:center; justify-content:center;">
-    <div class="card" style="width:360px; text-align:center;">
-        <h1 style="color:var(--brand); margin-bottom:20px;">Lucky Bee 🐝</h1>
+<div id="splash">
+    <div class="bee-logo">🐝</div>
+    <h2 style="color: white; margin-bottom: 20px; letter-spacing: 2px;">LUCKY BEE</h2>
+    <div class="loader-bar"><div class="loader-progress"></div></div>
+</div>
+
+<div id="loginPage" class="hidden">
+    <div class="login-card">
+        <div style="font-size: 40px; margin-bottom: 10px;">🐝</div>
+        <h2 style="margin-bottom: 30px; font-weight: 800;">Welcome Back</h2>
         <input id="username" placeholder="Username" value="admin">
         <input id="password" type="password" placeholder="Password" value="1234">
-        <button class="btn btn-brand" style="width:100%" onclick="login()">Enter Terminal</button>
+        <button class="btn" style="width: 100%;" onclick="attemptLogin()">Launch POS</button>
     </div>
 </div>
 
 <nav id="sidebar" class="hidden">
-    <div style="font-size:20px; font-weight:800; color:var(--brand); margin-bottom:30px;">🐝 Lucky Bee</div>
-    <button class="nav-link active" onclick="showTab('dashboard', this)">📊 <span>Insights</span></button>
-    <button class="nav-link" onclick="showTab('posTab', this)">🛒 <span>Terminal</span></button>
-    <button class="nav-link" onclick="showTab('invTab', this)">📦 <span>Inventory</span></button>
-    <button class="nav-link" onclick="showTab('loyaltyTab', this)">👥 <span>Customers</span></button>
-    <button class="nav-link" onclick="showTab('expenseTab', this)">💸 <span>Expenses</span></button>
-    
-    <div style="margin-top:auto;">
+    <div style="font-size: 24px; font-weight: 800; margin-bottom: 40px; color: var(--brand)">🐝 BeePOS</div>
+    <button class="nav-link active" onclick="showTab('dash', this)">📊 <span>Insights</span></button>
+    <button class="nav-link" onclick="showTab('pos', this)">🛒 <span>Terminal</span></button>
+    <button class="nav-link" onclick="showTab('inv', this)">📦 <span>Inventory</span></button>
+    <div style="margin-top: auto;">
         <button class="nav-link" onclick="toggleTheme()">🌓 <span>Theme</span></button>
-        <button class="nav-link" onclick="location.reload()" style="color:var(--danger)">🚪 <span>Logout</span></button>
+        <button class="nav-link" onclick="location.reload()" style="color: var(--danger)">🚪 <span>Logout</span></button>
     </div>
 </nav>
 
-<main id="mainContent" class="hidden">
-    <h1 id="tabTitle" style="margin-bottom:20px;">Insights</h1>
+<main id="mainApp" class="hidden">
+    <h1 id="pageTitle" style="margin-bottom: 30px;">Business Insights</h1>
 
-    <div id="dashboard" class="tab-content">
-        <div class="grid-4">
-            <div class="stat-box"><small>Total Revenue</small><h2 id="statRev">K 0.00</h2></div>
-            <div class="stat-box"><small>Net Profit</small><h2 id="statProfit" style="color:var(--success)">K 0.00</h2></div>
-            <div class="stat-box"><small>Expenses</small><h2 id="statExp" style="color:var(--danger)">K 0.00</h2></div>
-            <div class="stat-box"><small>Customers</small><h2 id="statCust">0</h2></div>
+    <div id="dash" class="tab">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div class="card"><h5>Revenue</h5><h2 id="revVal">K 0.00</h2></div>
+            <div class="card"><h5>Items Sold</h5><h2 id="soldVal">0</h2></div>
+            <div class="card"><h5>Low Stock</h5><h2 id="lowVal" style="color:red">0</h2></div>
         </div>
-        <div class="card"><h3>Revenue Stream</h3><canvas id="salesChart" height="80"></canvas></div>
+        <div class="card">
+            <canvas id="salesChart" height="100"></canvas>
+        </div>
     </div>
 
-    <div id="posTab" class="tab-content hidden">
-        <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:20px;">
+    <div id="pos" class="tab hidden">
+        <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px;">
             <div>
-                <input id="posSearch" placeholder="🔍 Scan or Search Product..." onkeyup="renderPOS()">
-                <div id="productGrid" class="product-grid"></div>
+                <input id="search" placeholder="Search product..." onkeyup="drawPOS()">
+                <div id="grid" class="product-grid"></div>
             </div>
             <div class="card">
-                <h3>Current Order</h3>
-                <select id="cartCustomer"><option value="">Walk-in Customer</option></select>
-                <div id="cartBox" style="min-height:250px; margin:15px 0; border-bottom:1px solid var(--border); overflow-y:auto;"></div>
-                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:22px; margin-bottom:15px;">
-                    <span>Total</span><span>K <span id="cartTotal">0.00</span></span>
+                <h3>Cart</h3>
+                <div id="cart" style="min-height: 300px; margin: 20px 0;"></div>
+                <div style="display: flex; justify-content: space-between; font-size: 24px; font-weight: 800;">
+                    <span>Total</span><span>K <span id="total">0.00</span></span>
                 </div>
-                <small>Payment Method:</small>
-                <select id="paymentMethod" style="margin-top:5px;">
-                    <option value="Cash">Cash</option>
-                    <option value="Mobile Money">Mobile Money</option>
-                    <option value="Card">Bank Card</option>
-                </select>
-                <button class="btn btn-brand" style="width:100%;" onclick="checkout()">Complete Transaction</button>
+                <button class="btn" style="width:100%; margin-top: 20px;" onclick="checkout()">Pay & Print</button>
             </div>
         </div>
     </div>
 
-    <div id="invTab" class="tab-content hidden">
+    <div id="inv" class="tab hidden">
         <div class="card">
-            <h3>Manage Products</h3>
-            <div style="display:grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr auto; gap:10px; margin-top:15px;">
-                <input id="pbar" placeholder="Barcode">
-                <input id="pname" placeholder="Name">
-                <input id="pcost" type="number" placeholder="Cost Price">
-                <input id="pprice" type="number" placeholder="Sell Price">
-                <input id="pqty" type="number" placeholder="Stock">
-                <button class="btn btn-brand" onclick="addItem()">Save</button>
+            <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: 10px;">
+                <input id="p_bar" placeholder="Barcode">
+                <input id="p_name" placeholder="Product Name">
+                <input id="p_cost" type="number" placeholder="Cost">
+                <input id="p_price" type="number" placeholder="Price">
+                <button class="btn" onclick="addStock()">Add</button>
             </div>
+        </div>
+        <div class="card">
             <table>
-                <thead><tr><th>Barcode</th><th>Name</th><th>Profit/Unit</th><th>Stock</th><th>Actions</th></tr></thead>
-                <tbody id="invBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="loyaltyTab" class="tab-content hidden">
-        <div class="card">
-            <h3>Customer Registry</h3>
-            <div style="display:grid; grid-template-columns: 2fr 2fr auto; gap:10px; margin-top:15px;">
-                <input id="cname" placeholder="Customer Name">
-                <input id="cphone" placeholder="Phone Number">
-                <button class="btn btn-brand" onclick="addCustomer()">Register Customer</button>
-            </div>
-            <table style="margin-top:20px;">
-                <thead><tr><th>Name</th><th>Phone</th><th>Total Spent</th></tr></thead>
-                <tbody id="loyaltyBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="expenseTab" class="tab-content hidden">
-        <div class="card">
-            <h3>Log Business Expense</h3>
-            <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap:10px; margin-top:15px;">
-                <input id="ename" placeholder="Expense (e.g. Rent, Transport, Electricity)">
-                <input id="eamt" type="number" placeholder="Amount">
-                <button class="btn btn-brand" onclick="addExpense()">Log Expense</button>
-            </div>
-            <table style="margin-top:20px;">
-                <thead><tr><th>Description</th><th>Date</th><th>Amount</th></tr></thead>
-                <tbody id="expenseBody"></tbody>
+                <thead><tr><th>Barcode</th><th>Name</th><th>Margin</th><th>Stock</th></tr></thead>
+                <tbody id="invTbl"></tbody>
             </table>
         </div>
     </div>
 </main>
 
 <script>
-    let inventory = JSON.parse(localStorage.getItem('lb_v12_inv')) || [];
-    let sales = JSON.parse(localStorage.getItem('lb_v12_sales')) || [];
-    let expenses = JSON.parse(localStorage.getItem('lb_v12_exp')) || [];
-    let customers = JSON.parse(localStorage.getItem('lb_v12_cust')) || [];
+    let inventory = JSON.parse(localStorage.getItem('bee_inv')) || [];
+    let sales = JSON.parse(localStorage.getItem('bee_sales')) || [];
     let cart = [];
 
-    function login() {
+    // 1. Splash Logic
+    window.onload = () => {
+        setTimeout(() => {
+            document.getElementById('splash').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('splash').classList.add('hidden');
+                document.getElementById('loginPage').classList.remove('hidden');
+            }, 800);
+        }, 2500);
+    };
+
+    function attemptLogin() {
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('sidebar').classList.remove('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
         refresh();
     }
 
-    function refresh() {
-        renderInventory(); renderPOS(); renderLoyalty(); renderExpenses(); updateStats();
-    }
-
-    // --- LOGIC FUNCTIONS ---
-    function addItem() {
-        const barcode = document.getElementById('pbar').value;
-        const name = document.getElementById('pname').value;
-        const cost = parseFloat(document.getElementById('pcost').value) || 0;
-        const price = parseFloat(document.getElementById('pprice').value) || 0;
-        const qty = parseInt(document.getElementById('pqty').value) || 0;
-        if(!name) return;
-        inventory.push({ barcode, name, cost, price, qty, sold: 0 });
+    function addStock() {
+        const n = document.getElementById('p_name').value;
+        const c = parseFloat(document.getElementById('p_cost').value) || 0;
+        const p = parseFloat(document.getElementById('p_price').value) || 0;
+        const b = document.getElementById('p_bar').value;
+        if(!n) return;
+        inventory.push({ barcode: b, name: n, cost: c, price: p, qty: 10, sold: 0 });
         save(); refresh();
-        ['pbar','pname','pcost','pprice','pqty'].forEach(id => document.getElementById(id).value = '');
     }
 
-    function addCustomer() {
-        const name = document.getElementById('cname').value;
-        const phone = document.getElementById('cphone').value;
-        if(!name) return;
-        customers.push({ name, phone, spent: 0 });
-        save(); refresh();
-        document.getElementById('cname').value = ''; document.getElementById('cphone').value = '';
-    }
-
-    function addExpense() {
-        const desc = document.getElementById('ename').value;
-        const amt = parseFloat(document.getElementById('eamt').value) || 0;
-        if(!desc || !amt) return;
-        expenses.push({ desc, amt, date: new Date().toLocaleDateString() });
-        save(); refresh();
-        document.getElementById('ename').value = ''; document.getElementById('eamt').value = '';
-    }
-
-    function addToCart(i) {
-        let p = inventory[i];
-        if(p.qty <= 0) return alert('Out of stock');
-        let item = cart.find(c => c.index === i);
-        if(item) item.qty++; else cart.push({ index: i, name: p.name, price: p.price, qty: 1 });
-        renderCart();
-    }
-
-    function checkout() {
-        if(!cart.length) return;
-        const total = parseFloat(document.getElementById('cartTotal').innerText);
-        const method = document.getElementById('paymentMethod').value;
-        const custIdx = document.getElementById('cartCustomer').value;
-
-        let transactionProfit = 0;
-
-        cart.forEach(c => {
-            const prod = inventory[c.index];
-            prod.qty -= c.qty;
-            prod.sold += c.qty;
-            transactionProfit += (prod.price - prod.cost) * c.qty;
-        });
-
-        if(custIdx !== "") customers[custIdx].spent += total;
-
-        sales.unshift({ 
-            id: 'LB'+Math.floor(Math.random()*9000), 
-            amount: total, 
-            profit: transactionProfit,
-            method: method,
-            date: new Date().toLocaleDateString() 
-        });
-
-        cart = []; save(); refresh(); renderCart();
-        alert('Sale Confirmed via ' + method);
-    }
-
-    // --- RENDER FUNCTIONS ---
-    function renderInventory() {
-        document.getElementById('invBody').innerHTML = inventory.map((p, i) => `
-            <tr>
-                <td><code>${p.barcode || 'N/A'}</code></td>
-                <td><b>${p.name}</b></td>
-                <td style="color:var(--success)">K${(p.price - p.cost).toFixed(2)}</td>
-                <td><span class="badge ${p.qty < 5 ? 'badge-danger' : 'badge-success'}">${p.qty} left</span></td>
-                <td><button onclick="deleteItem(${i})" style="color:var(--danger); border:none; background:none; cursor:pointer;">Remove</button></td>
-            </tr>
-        `).join('');
-    }
-
-    function renderPOS() {
-        const q = document.getElementById('posSearch').value.toLowerCase();
-        document.getElementById('productGrid').innerHTML = inventory.filter(p => p.name.toLowerCase().includes(q) || p.barcode.includes(q)).map((p, i) => `
-            <div class="product-card" onclick="addToCart(${inventory.indexOf(p)})">
-                <div class="stock-label">${p.qty}</div>
+    function drawPOS() {
+        const q = document.getElementById('search').value.toLowerCase();
+        document.getElementById('grid').innerHTML = inventory.filter(p => p.name.toLowerCase().includes(q)).map((p, i) => `
+            <div class="p-card" onclick="addToCart(${inventory.indexOf(p)})">
                 <strong>${p.name}</strong><br>
-                <small style="color:var(--brand)">K${p.price.toFixed(2)}</small>
+                <span style="color:var(--brand); font-weight:800;">K${p.price.toFixed(2)}</span>
             </div>
         `).join('');
     }
 
+    function addToCart(i) {
+        let item = cart.find(c => c.index === i);
+        if(item) item.qty++; else cart.push({ index: i, name: inventory[i].name, price: inventory[i].price, qty: 1 });
+        renderCart();
+    }
+
     function renderCart() {
-        let total = 0;
-        document.getElementById('cartBox').innerHTML = cart.map((c, i) => {
-            total += c.price * c.qty;
-            return `<div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px;">
-                <span>${c.name} x${c.qty}</span>
-                <strong>K${(c.price*c.qty).toFixed(2)}</strong>
+        let t = 0;
+        document.getElementById('cart').innerHTML = cart.map(c => {
+            t += c.price * c.qty;
+            return `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <span>${c.name} x${c.qty}</span><b>K${(c.price*c.qty).toFixed(2)}</b>
             </div>`;
         }).join('');
-        document.getElementById('cartTotal').innerText = total.toFixed(2);
+        document.getElementById('total').innerText = t.toFixed(2);
     }
 
-    function renderLoyalty() {
-        document.getElementById('loyaltyBody').innerHTML = customers.map(c => `
-            <tr><td>${c.name}</td><td>${c.phone}</td><td>K${c.spent.toFixed(2)}</td></tr>
+    function checkout() {
+        if(!cart.length) return;
+        cart.forEach(c => {
+            inventory[c.index].qty -= c.qty;
+            inventory[c.index].sold += c.qty;
+        });
+        sales.push({ total: parseFloat(document.getElementById('total').innerText), date: new Date().toLocaleDateString() });
+        cart = []; save(); refresh(); renderCart();
+        alert("Sale Complete!");
+    }
+
+    function refresh() {
+        document.getElementById('invTbl').innerHTML = inventory.map(p => `
+            <tr><td>${p.barcode}</td><td><b>${p.name}</b></td><td>K${(p.price-p.cost).toFixed(2)}</td><td>${p.qty}</td></tr>
         `).join('');
-        document.getElementById('cartCustomer').innerHTML = '<option value="">Walk-in Customer</option>' + 
-            customers.map((c, i) => `<option value="${i}">${c.name}</option>`).join('');
+        const rev = sales.reduce((a,b) => a+b.total, 0);
+        document.getElementById('revVal').innerText = 'K ' + rev.toFixed(2);
+        document.getElementById('soldVal').innerText = inventory.reduce((a,b) => a+b.sold, 0);
+        document.getElementById('lowVal').innerText = inventory.filter(p => p.qty < 5).length;
+        drawPOS();
     }
 
-    function renderExpenses() {
-        document.getElementById('expenseBody').innerHTML = expenses.map(e => `
-            <tr><td>${e.desc}</td><td>${e.date}</td><td style="color:var(--danger)">K${e.amt.toFixed(2)}</td></tr>
-        `).join('');
-    }
-
-    function updateStats() {
-        const rev = sales.reduce((a,b) => a+b.amount, 0);
-        const grossProfit = sales.reduce((a,b) => a+b.profit, 0);
-        const exp = expenses.reduce((a,b) => a+b.amt, 0);
-        document.getElementById('statRev').innerText = 'K ' + rev.toFixed(2);
-        document.getElementById('statProfit').innerText = 'K ' + (grossProfit - exp).toFixed(2);
-        document.getElementById('statExp').innerText = 'K ' + exp.toFixed(2);
-        document.getElementById('statCust').innerText = customers.length;
+    function showTab(id, btn) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        btn.classList.add('active');
     }
 
     function toggleTheme() {
@@ -324,21 +266,10 @@
         b.setAttribute('data-theme', b.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
     }
 
-    function showTab(id, btn) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('tabTitle').innerText = btn.innerText.trim();
+    function save() { 
+        localStorage.setItem('bee_inv', JSON.stringify(inventory)); 
+        localStorage.setItem('bee_sales', JSON.stringify(sales)); 
     }
-
-    function save() {
-        localStorage.setItem('lb_v12_inv', JSON.stringify(inventory));
-        localStorage.setItem('lb_v12_sales', JSON.stringify(sales));
-        localStorage.setItem('lb_v12_exp', JSON.stringify(expenses));
-        localStorage.setItem('lb_v12_cust', JSON.stringify(customers));
-    }
-    function deleteItem(i) { inventory.splice(i,1); save(); refresh(); }
 </script>
 </body>
 </html>
