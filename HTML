@@ -3,209 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Bee | Premium POS</title>
+    <title>Lucky Bee POS | Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { 
-                        bee: '#FACC15',
-                        surface: '#0F172A',
-                        card: '#1E293B'
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { background-color: #020617; color: #f8fafc; }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         .hide { display: none !important; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .active-nav { background: #FACC15 !important; color: #020617 !important; box-shadow: 0 4px 15px rgba(250, 204, 21, 0.3); }
-        input::placeholder { color: #64748b; }
-        /* Custom scrollbar for dark mode */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .receipt-font { font-family: 'Roboto Mono', monospace; }
+        .sidebar-link.active { background: #1e293b; color: white; border-left: 4px solid #eab308; }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex">
+<body class="h-screen overflow-hidden flex flex-col">
 
-    <div id="loginScreen" class="fixed inset-0 z-[9999] bg-[#020617] flex items-center justify-center p-6">
-        <div class="glass p-10 rounded-[2rem] w-full max-w-md text-center shadow-2xl">
-            <div class="w-24 h-24 bg-bee rounded-3xl mx-auto flex items-center justify-center text-5xl mb-6 shadow-[0_0_30px_rgba(250,204,21,0.4)]">🐝</div>
-            <h1 class="text-4xl font-extrabold tracking-tighter mb-2">Lucky Bee</h1>
-            <p class="text-slate-400 font-medium mb-10">Sign in to your register</p>
-            
-            <div class="space-y-4 text-left">
-                <input id="loginUser" type="text" placeholder="Username" value="admin" class="w-full bg-slate-800/50 border border-slate-700 px-5 py-4 rounded-2xl outline-none focus:border-bee transition-all text-white">
-                <input id="loginPass" type="password" placeholder="Password" value="1234" class="w-full bg-slate-800/50 border border-slate-700 px-5 py-4 rounded-2xl outline-none focus:border-bee transition-all text-white">
-                <button onclick="loginApp()" class="w-full bg-bee text-black font-extrabold py-4 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all mt-6 shadow-lg">
-                    UNLOCK SYSTEM
-                </button>
+    <div id="loginScreen" class="fixed inset-0 z-[9999] bg-slate-900 flex items-center justify-center">
+        <div class="bg-white p-10 rounded-xl shadow-2xl w-full max-w-sm">
+            <div class="text-center mb-8">
+                <div class="text-4xl mb-2">🐝</div>
+                <h1 class="text-2xl font-800 text-slate-900 uppercase tracking-widest">Lucky Bee</h1>
+                <p class="text-slate-400 text-sm">Point of Sale System</p>
+            </div>
+            <div class="space-y-4">
+                <input id="loginUser" type="text" placeholder="Username" value="admin" class="w-full border-2 border-slate-100 p-3 rounded-lg outline-none focus:border-yellow-500">
+                <input id="loginPass" type="password" placeholder="Password" value="1234" class="w-full border-2 border-slate-100 p-3 rounded-lg outline-none focus:border-yellow-500">
+                <button onclick="loginApp()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold py-3 rounded-lg transition-all">SIGN IN</button>
             </div>
         </div>
     </div>
 
-    <aside id="sidebar" class="w-72 bg-surface border-r border-slate-800 flex flex-col hide p-6">
-        <div class="flex items-center gap-4 mb-12 px-2">
-            <div class="w-10 h-10 bg-bee rounded-xl flex items-center justify-center text-black font-bold">B</div>
-            <span class="text-2xl font-black tracking-tighter">Lucky Bee</span>
+    <header id="topBar" class="bg-slate-900 text-white h-16 flex items-center justify-between px-6 shrink-0 hide">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🐝</span>
+                <span class="font-black text-xl tracking-tight">LUCKY BEE</span>
+            </div>
+            <nav class="flex h-16">
+                <button onclick="navView('pos')" id="nav-pos" class="px-6 flex items-center gap-2 hover:bg-slate-800 border-b-4 border-transparent font-bold">
+                    <i class="fa-solid fa-cash-register"></i> TERMINAL
+                </button>
+                <button onclick="navView('inv')" id="nav-inv" class="px-6 flex items-center gap-2 hover:bg-slate-800 border-b-4 border-transparent font-bold">
+                    <i class="fa-solid fa-boxes-stacked"></i> INVENTORY
+                </button>
+                <button onclick="navView('dash')" id="nav-dash" class="px-6 flex items-center gap-2 hover:bg-slate-800 border-b-4 border-transparent font-bold">
+                    <i class="fa-solid fa-chart-line"></i> SALES REPORT
+                </button>
+            </nav>
         </div>
+        <div class="flex items-center gap-4">
+            <span class="text-slate-400 text-sm">Station: 01</span>
+            <button onclick="location.reload()" class="bg-red-500/20 text-red-400 px-3 py-1 rounded text-xs font-bold hover:bg-red-500 hover:text-white">LOGOUT</button>
+        </div>
+    </header>
+
+    <main id="mainContent" class="flex-1 flex overflow-hidden hide">
         
-        <nav class="flex-1 space-y-3">
-            <button onclick="navView('dash')" id="nav-dash" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-slate-400 font-bold hover:bg-slate-800 transition-all active-nav">
-                <i class="fa-solid fa-house-chimney text-xl"></i> Dashboard
-            </button>
-            <button onclick="navView('pos')" id="nav-pos" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-slate-400 font-bold hover:bg-slate-800 transition-all">
-                <i class="fa-solid fa-receipt text-xl"></i> Terminal
-            </button>
-            <button onclick="navView('inv')" id="nav-inv" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-slate-400 font-bold hover:bg-slate-800 transition-all">
-                <i class="fa-solid fa-box-archive text-xl"></i> Stock
-            </button>
-        </nav>
-
-        <button onclick="location.reload()" class="mt-auto flex items-center gap-4 px-5 py-4 text-red-400 font-bold hover:bg-red-500/10 rounded-2xl transition-all">
-            <i class="fa-solid fa-power-off"></i> Logout
-        </button>
-    </aside>
-
-    <main id="mainContent" class="flex-1 flex flex-col hide">
-        
-        <div id="view-dash" class="p-10 overflow-y-auto view-section">
-            <header class="mb-12">
-                <h1 class="text-4xl font-black tracking-tight mb-2">Morning, Admin 👋</h1>
-                <p class="text-slate-500 font-medium">Here's what's happening today.</p>
-            </header>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div class="glass p-8 rounded-[2rem]">
-                    <p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-4">Daily Sales</p>
-                    <div class="text-5xl font-black text-bee" id="dashRev">K 0.00</div>
-                </div>
-                <div class="glass p-8 rounded-[2rem]">
-                    <p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-4">Volume</p>
-                    <div class="text-5xl font-black" id="dashSold">0</div>
-                </div>
-                <div class="glass p-8 rounded-[2rem]">
-                    <p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-4">SKU Count</p>
-                    <div class="text-5xl font-black" id="dashItems">0</div>
-                </div>
-            </div>
-
-            <div class="glass rounded-[2rem] overflow-hidden">
-                <div class="p-8 border-b border-slate-800 font-black text-xl">Recent Sales Log</div>
-                <table class="w-full text-left">
-                    <thead class="bg-slate-800/30 text-slate-500 text-xs uppercase tracking-tighter">
-                        <tr><th class="p-6">TX ID</th><th class="p-6">Date</th><th class="p-6">Items</th><th class="p-6">Value</th></tr>
-                    </thead>
-                    <tbody id="txHistory" class="divide-y divide-slate-800"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="view-pos" class="h-full flex hide view-section">
-            <div class="flex-1 p-8 flex flex-col h-full">
-                <div class="relative mb-8">
-                    <i class="fa-solid fa-search absolute left-6 top-6 text-slate-500"></i>
-                    <input id="posSearch" type="text" placeholder="Start typing to find products..." onkeyup="renderPOS()" class="w-full bg-slate-900 border border-slate-800 pl-16 pr-6 py-5 rounded-[1.5rem] outline-none focus:border-bee text-xl">
-                </div>
-                <div id="posGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-6 overflow-y-auto pb-10"></div>
-            </div>
-
-            <div class="w-[450px] bg-surface border-l border-slate-800 flex flex-col">
-                <div class="p-8 flex justify-between items-end border-b border-slate-800">
-                    <h2 class="text-2xl font-black">Current Order</h2>
-                    <button onclick="clearCart()" class="text-red-500 font-bold text-sm">RESET</button>
-                </div>
-                <div id="cartList" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
-                <div class="p-8 glass m-6 rounded-[2rem] space-y-6">
-                    <div class="flex justify-between text-slate-400 font-bold"><span>Tax (0%)</span><span>K 0.00</span></div>
-                    <div class="flex justify-between text-3xl font-black"><span>Total</span><span class="text-bee" id="cartTotal">K 0.00</span></div>
-                    <button onclick="checkout()" class="w-full bg-bee text-black font-black py-6 rounded-2xl text-xl shadow-lg hover:brightness-110 active:scale-95 transition-all">CHECKOUT</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-inv" class="p-10 hide view-section flex flex-col h-full">
-            <h1 class="text-4xl font-black mb-10">Warehouse Inventory</h1>
-            <div class="grid grid-cols-12 gap-8 flex-1 overflow-hidden">
-                <div class="col-span-4 glass p-8 rounded-[2.5rem] h-fit">
-                    <h3 class="text-xl font-black mb-8" id="formTitle">Create New Item</h3>
-                    <input type="hidden" id="editIndex" value="-1">
-                    <div class="space-y-6">
-                        <input id="pName" type="text" placeholder="Product Name" class="w-full bg-slate-800/50 border border-slate-700 px-5 py-4 rounded-xl outline-none focus:border-bee">
-                        <div class="grid grid-cols-2 gap-4">
-                            <input id="pPrice" type="number" placeholder="Price (K)" class="w-full bg-slate-800/50 border border-slate-700 px-5 py-4 rounded-xl outline-none focus:border-bee">
-                            <input id="pQty" type="number" placeholder="Stock" class="w-full bg-slate-800/50 border border-slate-700 px-5 py-4 rounded-xl outline-none focus:border-bee">
-                        </div>
-                        <div class="flex gap-4">
-                            <button onclick="saveProduct()" class="flex-1 bg-bee text-black font-black py-4 rounded-xl transition-all">SAVE PRODUCT</button>
-                            <button onclick="cancelEdit()" id="btnCancel" class="hide bg-slate-700 p-4 rounded-xl">X</button>
-                        </div>
+        <section class="flex-1 flex flex-col min-w-0">
+            
+            <div id="view-pos" class="flex-1 flex flex-col view-section">
+                <div class="p-4 bg-white border-b flex gap-4">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input id="posSearch" type="text" placeholder="Search product name..." onkeyup="renderPOS()" class="w-full pl-12 pr-4 py-3 bg-slate-100 rounded-lg outline-none focus:ring-2 focus:ring-yellow-400">
                     </div>
                 </div>
-                <div class="col-span-8 glass rounded-[2.5rem] overflow-hidden flex flex-col">
-                    <div class="p-6 border-b border-slate-800">
-                        <input id="invSearch" type="text" placeholder="Filter inventory..." onkeyup="renderInventory()" class="bg-slate-900 border border-slate-800 px-6 py-3 rounded-xl w-full max-w-sm outline-none">
+                <div id="posGrid" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 content-start">
                     </div>
-                    <div class="overflow-y-auto flex-1">
+            </div>
+
+            <div id="view-inv" class="flex-1 p-6 overflow-y-auto hide view-section">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black text-slate-800 uppercase">Manage Stock</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border-2 border-slate-200">
+                        <h3 id="formTitle" class="font-bold text-lg mb-4">Add New Item</h3>
+                        <div class="space-y-4">
+                            <input id="pName" type="text" placeholder="Item Name" class="w-full border p-3 rounded-lg outline-none">
+                            <input id="pPrice" type="number" placeholder="Price (K)" class="w-full border p-3 rounded-lg outline-none">
+                            <input id="pQty" type="number" placeholder="Stock Quantity" class="w-full border p-3 rounded-lg outline-none">
+                            <input type="hidden" id="editIndex" value="-1">
+                            <div class="flex gap-2">
+                                <button onclick="saveProduct()" class="flex-1 bg-slate-900 text-white font-bold py-3 rounded-lg">SAVE ITEM</button>
+                                <button onclick="cancelEdit()" id="btnCancel" class="hide bg-slate-200 px-4 rounded-lg">X</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 bg-white rounded-xl border-2 border-slate-200 overflow-hidden">
                         <table class="w-full text-left">
-                            <thead class="bg-slate-800/30 text-slate-500 text-xs font-bold uppercase">
-                                <tr><th class="p-6">Item Name</th><th class="p-6">Price</th><th class="p-6">Stock</th><th class="p-6">Actions</th></tr>
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr><th class="p-4">Product</th><th class="p-4">Price</th><th class="p-4">Stock</th><th class="p-4 text-right">Actions</th></tr>
                             </thead>
-                            <tbody id="invList" class="divide-y divide-slate-800/50"></tbody>
+                            <tbody id="invList" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div id="view-dash" class="flex-1 p-6 overflow-y-auto hide view-section">
+                <h2 class="text-2xl font-black text-slate-800 uppercase mb-6">Sales Performance</h2>
+                <div class="grid grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border-b-4 border-yellow-400 shadow-sm">
+                        <div class="text-slate-400 text-xs font-bold uppercase">Total Revenue</div>
+                        <div class="text-3xl font-black" id="dashRev">K 0.00</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border-b-4 border-slate-800 shadow-sm">
+                        <div class="text-slate-400 text-xs font-bold uppercase">Sales Volume</div>
+                        <div class="text-3xl font-black" id="dashSold">0</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border-b-4 border-emerald-500 shadow-sm">
+                        <div class="text-slate-400 text-xs font-bold uppercase">Inventory Items</div>
+                        <div class="text-3xl font-black" id="dashItems">0</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border-2 border-slate-200">
+                    <div class="p-4 font-bold border-b">Recent Transactions</div>
+                    <table class="w-full text-left">
+                        <tbody id="txHistory" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <aside id="posBasket" class="w-96 bg-white border-l-2 border-slate-200 flex flex-col shrink-0">
+            <div class="p-4 bg-slate-50 border-b flex justify-between items-center">
+                <span class="font-bold text-slate-800">SHOPPING CART</span>
+                <button onclick="clearCart()" class="text-xs font-bold text-red-500 hover:underline">EMPTY</button>
+            </div>
+            <div id="cartList" class="flex-1 overflow-y-auto p-4 space-y-2">
+                </div>
+            <div class="p-6 bg-slate-900 text-white">
+                <div class="flex justify-between mb-2 text-slate-400 font-bold uppercase text-xs">
+                    <span>Subtotal</span><span id="cartSub">K 0.00</span>
+                </div>
+                <div class="flex justify-between mb-6">
+                    <span class="text-lg font-bold">TOTAL</span>
+                    <span class="text-2xl font-black text-yellow-400" id="cartTotal">K 0.00</span>
+                </div>
+                <button onclick="checkout()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black py-4 rounded-lg text-lg transition-all">
+                    COMPLETE ORDER (CASH)
+                </button>
+            </div>
+        </aside>
+
     </main>
 
     <script>
         let db = [], sales = [], cart = [];
 
         function loginApp() {
-            const user = document.getElementById('loginUser').value.trim();
-            const pass = document.getElementById('loginPass').value.trim();
-
-            if (user === 'admin' && pass === '1234') {
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
+            if(u === 'admin' && p === '1234') {
                 try {
-                    db = JSON.parse(localStorage.getItem('lb_v25_db')) || [];
-                    sales = JSON.parse(localStorage.getItem('lb_v25_sales')) || [];
-                } catch(e) {}
-                
+                    db = JSON.parse(localStorage.getItem('lb_v26_db')) || [];
+                    sales = JSON.parse(localStorage.getItem('lb_v26_sales')) || [];
+                } catch(e){}
                 document.getElementById('loginScreen').classList.add('hide');
-                document.getElementById('sidebar').classList.remove('hide');
+                document.getElementById('topBar').classList.remove('hide');
                 document.getElementById('mainContent').classList.remove('hide');
+                navView('pos');
                 refreshAll();
-            } else {
-                alert("Login Failed");
-            }
+            } else alert("Invalid credentials");
         }
 
         function navView(id) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hide'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-nav'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('border-yellow-400', 'bg-slate-800'));
+            
             document.getElementById(`view-${id}`).classList.remove('hide');
-            document.getElementById(`nav-${id}`).classList.add('active-nav');
+            document.getElementById(`nav-${id}`).classList.add('border-yellow-400', 'bg-slate-800');
+            
+            // Show/Hide Cart sidebar depending on view
+            if(id === 'pos') document.getElementById('posBasket').classList.remove('hide');
+            else document.getElementById('posBasket').classList.add('hide');
         }
 
-        // --- CORE LOGIC ---
+        // --- INVENTORY LOGIC ---
         function saveProduct() {
-            const name = document.getElementById('pName').value;
+            const name = document.getElementById('pName').value.trim();
             const price = parseFloat(document.getElementById('pPrice').value);
             const qty = parseInt(document.getElementById('pQty').value);
             const idx = parseInt(document.getElementById('editIndex').value);
+            if(!name || isNaN(price)) return alert("Fill all fields correctly");
 
-            if(!name || isNaN(price)) return;
             if(idx >= 0) db[idx] = { name, price, qty };
             else db.unshift({ name, price, qty });
-
+            
             saveData(); cancelEdit(); refreshAll();
         }
 
@@ -214,7 +197,7 @@
             document.getElementById('pPrice').value = '';
             document.getElementById('pQty').value = '';
             document.getElementById('editIndex').value = '-1';
-            document.getElementById('formTitle').innerText = "Create New Item";
+            document.getElementById('formTitle').innerText = "Add New Item";
             document.getElementById('btnCancel').classList.add('hide');
         }
 
@@ -223,106 +206,122 @@
             document.getElementById('pPrice').value = db[i].price;
             document.getElementById('pQty').value = db[i].qty;
             document.getElementById('editIndex').value = i;
-            document.getElementById('formTitle').innerText = "Updating Item";
+            document.getElementById('formTitle').innerText = "Edit Item";
             document.getElementById('btnCancel').classList.remove('hide');
         }
 
+        function deleteItem(i) { if(confirm("Delete item?")) { db.splice(i,1); saveData(); refreshAll(); } }
+
         function renderInventory() {
-            const q = document.getElementById('invSearch').value.toLowerCase();
-            document.getElementById('invList').innerHTML = db.map((item, i) => {
-                if(q && !item.name.toLowerCase().includes(q)) return '';
-                return `<tr class="hover:bg-slate-800/20 transition">
-                    <td class="p-6 font-bold text-lg">${item.name}</td>
-                    <td class="p-6 text-bee font-bold">K ${item.price.toFixed(2)}</td>
-                    <td class="p-6"><span class="bg-slate-800 px-3 py-1 rounded-lg text-sm">${item.qty} in stock</span></td>
-                    <td class="p-6">
-                        <button onclick="editItem(${i})" class="text-blue-400 mr-4 font-bold">EDIT</button>
-                        <button onclick="deleteItem(${i})" class="text-red-500 font-bold">DELETE</button>
+            document.getElementById('invList').innerHTML = db.map((item, i) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-4 font-bold text-slate-700">${item.name}</td>
+                    <td class="p-4 text-slate-500">K ${item.price.toFixed(2)}</td>
+                    <td class="p-4"><span class="bg-slate-100 px-2 py-1 rounded font-bold">${item.qty}</span></td>
+                    <td class="p-4 text-right">
+                        <button onclick="editItem(${i})" class="text-blue-600 font-bold mr-3 text-sm">EDIT</button>
+                        <button onclick="deleteItem(${i})" class="text-red-500 font-bold text-sm">DELETE</button>
                     </td>
-                </tr>`;
-            }).join('');
+                </tr>
+            `).join('');
         }
 
-        function deleteItem(i) { if(confirm("Delete?")) { db.splice(i,1); saveData(); refreshAll(); } }
-
+        // --- POS LOGIC ---
         function renderPOS() {
             const q = document.getElementById('posSearch').value.toLowerCase();
             document.getElementById('posGrid').innerHTML = db.map((item, i) => {
                 if(q && !item.name.toLowerCase().includes(q)) return '';
-                const stockCol = item.qty < 5 ? 'text-red-500' : 'text-slate-500';
-                return `<div onclick="addToCart(${i})" class="glass p-6 rounded-[2rem] cursor-pointer hover:border-bee transition-all active:scale-95">
-                    <div class="text-xl font-black mb-2 truncate">${item.name}</div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-2xl font-black text-bee">K${item.price.toFixed(2)}</span>
-                        <span class="text-xs font-bold ${stockCol}">QTY ${item.qty}</span>
+                const disabled = item.qty <= 0;
+                return `
+                <div onclick="${!disabled ? `addToCart(${i})` : ''}" class="bg-white p-4 rounded-xl border-2 border-transparent hover:border-yellow-400 cursor-pointer transition-all shadow-sm flex flex-col justify-between h-32 ${disabled ? 'opacity-40 grayscale' : ''}">
+                    <div class="font-extrabold text-slate-800 leading-tight">${item.name}</div>
+                    <div class="flex justify-between items-end">
+                        <span class="text-xs text-slate-400 font-bold">STOCK: ${item.qty}</span>
+                        <span class="text-lg font-black text-slate-900">K${item.price.toFixed(2)}</span>
                     </div>
                 </div>`;
             }).join('');
         }
 
         function addToCart(i) {
-            const item = db[i];
-            const ext = cart.find(c => c.index === i);
-            if(ext) { if(ext.qty >= item.qty) return; ext.qty++; }
-            else cart.push({ index: i, name: item.name, price: item.price, qty: 1 });
+            const existing = cart.find(c => c.index === i);
+            if(existing) {
+                if(existing.qty >= db[i].qty) return alert("Out of stock!");
+                existing.qty++;
+            } else {
+                cart.push({ index: i, name: db[i].name, price: db[i].price, qty: 1 });
+            }
             renderCart();
         }
 
         function renderCart() {
             let total = 0;
             document.getElementById('cartList').innerHTML = cart.map((c, i) => {
-                total += (c.price * c.qty);
-                return `<div class="bg-slate-800/50 p-5 rounded-2xl flex justify-between items-center">
-                    <div>
-                        <div class="font-bold text-lg">${c.name}</div>
-                        <div class="text-bee font-bold">K${c.price.toFixed(2)}</div>
+                const sub = c.price * c.qty;
+                total += sub;
+                return `
+                <div class="bg-slate-50 p-3 rounded-lg flex justify-between items-center border border-slate-200">
+                    <div class="min-w-0 flex-1">
+                        <div class="font-bold text-slate-800 truncate">${c.name}</div>
+                        <div class="text-xs text-slate-500">K${c.price.toFixed(2)} x ${c.qty}</div>
                     </div>
-                    <div class="flex items-center gap-4 bg-slate-900 rounded-xl p-2 border border-slate-700">
-                        <button onclick="updateCart(${i},-1)" class="w-8 h-8 font-black">-</button>
-                        <span class="font-black">${c.qty}</span>
-                        <button onclick="updateCart(${i},1)" class="w-8 h-8 font-black text-bee">+</button>
+                    <div class="flex items-center gap-2 ml-4">
+                        <button onclick="updateCart(${i},-1)" class="w-6 h-6 bg-slate-200 rounded font-bold">-</button>
+                        <span class="font-bold w-4 text-center">${c.qty}</span>
+                        <button onclick="updateCart(${i},1)" class="w-6 h-6 bg-slate-200 rounded font-bold">+</button>
                     </div>
                 </div>`;
-            }).join('') || `<div class="text-center text-slate-600 py-20 font-bold">NO ITEMS ADDED</div>`;
+            }).join('') || `<div class="h-full flex items-center justify-center text-slate-300 font-bold uppercase tracking-tighter">Basket is Empty</div>`;
+            
+            document.getElementById('cartSub').innerText = `K ${total.toFixed(2)}`;
             document.getElementById('cartTotal').innerText = `K ${total.toFixed(2)}`;
         }
 
-        function updateCart(i, v) {
-            cart[i].qty += v;
+        function updateCart(i, amt) {
+            cart[i].qty += amt;
             if(cart[i].qty > db[cart[i].index].qty) cart[i].qty = db[cart[i].index].qty;
-            if(cart[i].qty <= 0) cart.splice(i,1);
+            if(cart[i].qty <= 0) cart.splice(i, 1);
             renderCart();
         }
 
+        function clearCart() { cart = []; renderCart(); }
+
         function checkout() {
             if(!cart.length) return;
-            let total = 0, items = 0;
-            cart.forEach(c => { db[c.index].qty -= c.qty; total += (c.price * c.qty); items += c.qty; });
-            sales.unshift({ id: 'LB-'+Date.now().toString().slice(-6), date: new Date().toLocaleDateString(), total, items });
-            saveData(); cart = []; refreshAll(); alert("Payment Successful!");
+            let total = 0, itemsCount = 0;
+            cart.forEach(c => {
+                db[c.index].qty -= c.qty;
+                total += (c.price * c.qty);
+                itemsCount += c.qty;
+            });
+            sales.unshift({ id: Date.now().toString().slice(-6), date: new Date().toLocaleString(), total, items: itemsCount });
+            saveData(); cart = []; refreshAll();
+            alert("Transaction Complete!");
         }
 
         function renderDashboard() {
-            const rev = sales.reduce((a,b)=>a+b.total, 0);
-            const sold = sales.reduce((a,b)=>a+b.items, 0);
+            const rev = sales.reduce((a,b) => a + b.total, 0);
+            const sold = sales.reduce((a,b) => a + b.items, 0);
             document.getElementById('dashRev').innerText = `K ${rev.toFixed(2)}`;
             document.getElementById('dashSold').innerText = sold;
             document.getElementById('dashItems').innerText = db.length;
-            document.getElementById('txHistory').innerHTML = sales.slice(0,8).map(tx => `
-                <tr class="hover:bg-slate-800/10">
-                    <td class="p-6 font-mono text-bee">#${tx.id}</td>
-                    <td class="p-6 text-slate-400">${tx.date}</td>
-                    <td class="p-6 font-bold">${tx.items}</td>
-                    <td class="p-6 font-black text-lg">K ${tx.total.toFixed(2)}</td>
+            document.getElementById('txHistory').innerHTML = sales.map(s => `
+                <tr class="text-sm">
+                    <td class="p-4 font-mono text-slate-500">#${s.id}</td>
+                    <td class="p-4">${s.date}</td>
+                    <td class="p-4 font-bold">${s.items} Items</td>
+                    <td class="p-4 font-black">K ${s.total.toFixed(2)}</td>
                 </tr>
             `).join('');
         }
 
-        function saveData() { 
-            try { localStorage.setItem('lb_v25_db', JSON.stringify(db)); localStorage.setItem('lb_v25_sales', JSON.stringify(sales)); } catch(e) {} 
+        function saveData() {
+            try {
+                localStorage.setItem('lb_v26_db', JSON.stringify(db));
+                localStorage.setItem('lb_v26_sales', JSON.stringify(sales));
+            } catch(e){}
         }
 
-        function clearCart() { cart = []; renderCart(); }
         function refreshAll() { renderInventory(); renderPOS(); renderCart(); renderDashboard(); }
     </script>
 </body>
